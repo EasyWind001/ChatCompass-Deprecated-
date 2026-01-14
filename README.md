@@ -458,13 +458,57 @@ conversations_fts (
 
 ## 🤝 贡献指南
 
-欢迎提交Issue和Pull Request！
+我们欢迎并感谢任何形式的贡献！在开始之前，请阅读我们的贡献指南：
 
-1. Fork本项目
-2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
-3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
-4. 推送到分支 (`git push origin feature/AmazingFeature`)
-5. 开启Pull Request
+📖 **完整文档**: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### 快速开始
+
+1. **Fork并克隆仓库**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/ChatCompass.git
+   cd ChatCompass
+   ```
+
+2. **创建功能分支**（遵循命名规范）
+   ```bash
+   git checkout -b feature/your-feature-name
+   # 或
+   git checkout -b bugfix/your-bugfix-name
+   ```
+
+3. **开发并测试**
+   ```bash
+   # 开发功能...
+   # 添加测试...
+   python -m pytest tests/ -v  # 必须通过所有测试
+   ```
+
+4. **提交代码**（遵循Commit规范）
+   ```bash
+   git commit -m "feat(scope): your feature description"
+   ```
+
+5. **推送并创建Pull Request**
+   ```bash
+   git push origin feature/your-feature-name
+   # 在GitHub上创建PR
+   ```
+
+### 📋 重要规范
+
+- 🌳 **分支管理**: [docs/BRANCH_MANAGEMENT.md](docs/BRANCH_MANAGEMENT.md)
+- 📝 **提交规范**: Conventional Commits格式
+- 🧪 **测试要求**: 所有测试必须通过，新功能需要测试
+- 🔒 **安全规则**: SQL必须使用参数化查询
+- 🤖 **AI助手**: [.ai-assistant-rules.md](.ai-assistant-rules.md)
+
+### 🚫 禁止操作
+
+- ❌ 直接推送到 main 或 develop 分支
+- ❌ 提交未经测试的代码
+- ❌ 使用字符串拼接构造SQL（SQL注入风险）
+- ❌ 提交包含密码、密钥等敏感信息
 
 ### 开发环境设置
 

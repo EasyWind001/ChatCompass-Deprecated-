@@ -58,26 +58,34 @@
 
 ### 按主题分类
 
-#### 搜索功能
+#### 🤝 贡献开发
+- [../CONTRIBUTING.md](../CONTRIBUTING.md) - **完整贡献指南** ⭐
+- [BRANCH_MANAGEMENT.md](BRANCH_MANAGEMENT.md) - **分支管理规范** ⭐
+- [../.ai-assistant-rules.md](../.ai-assistant-rules.md) - **AI助手开发规范** 🤖
+- [../.cursorrules](../.cursorrules) - **Cursor快速规则** 🤖
+
+#### 🔍 搜索功能
 - [search_implementation.md](search_implementation.md) - 搜索实现原理
 - [SEARCH_CONTEXT_FEATURE.md](SEARCH_CONTEXT_FEATURE.md) - 上下文搜索功能
 - [SEARCH_ENHANCEMENT_SUMMARY.md](SEARCH_ENHANCEMENT_SUMMARY.md) - 搜索增强总结
 
-#### 数据库设计
+#### 🗄️ 数据库设计
 - [../database/schema.sql](../database/schema.sql) - 数据库表结构
 - [PROJECT_SUMMARY.md](PROJECT_SUMMARY.md#数据库设计) - 数据库设计说明
 
-#### 爬虫开发
+#### 🕷️ 爬虫开发
 - [archive/BUGFIX_REPORT.md](archive/BUGFIX_REPORT.md) - ChatGPT爬虫修复过程
 
-#### 测试相关
+#### 🧪 测试相关
 - [../tests/README.md](../tests/README.md) - 测试套件说明
 - [archive/TEST_REPORT.md](archive/TEST_REPORT.md) - 详细测试报告
 
 ## 🔗 相关链接
 
 - [主README](../README.md) - 项目主文档
+- [中文README](../README_CN.md) - 中文使用指南
 - [更新日志](../CHANGELOG.md) - 版本更新历史
+- [开源许可](../LICENSE) - MIT License
 - [测试说明](../tests/README.md) - 测试相关文档
 
 ## 📝 文档贡献
@@ -87,7 +95,8 @@
 1. 确保文档格式正确（Markdown）
 2. 添加必要的代码示例
 3. 更新本README的索引
-4. 提交Pull Request
+4. 遵循 [贡献指南](../CONTRIBUTING.md)
+5. 提交Pull Request
 
 ---
 
