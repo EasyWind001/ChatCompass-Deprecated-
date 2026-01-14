@@ -297,6 +297,29 @@ class StorageFactory:
     """存储工厂类"""
     
     _storage_types = {}
+    _initialized = False
+    
+    @classmethod
+    def _auto_register(cls):
+        """自动注册所有可用的存储类型"""
+        if cls._initialized:
+            return
+        
+        # 注册SQLite
+        try:
+            from .sqlite_manager import SQLiteManager
+            cls._storage_types['sqlite'] = SQLiteManager
+        except ImportError:
+            pass
+        
+        # 注册Elasticsearch
+        try:
+            from .es_manager import ElasticsearchManager
+            cls._storage_types['elasticsearch'] = ElasticsearchManager
+        except ImportError:
+            pass
+        
+        cls._initialized = True
     
     @classmethod
     def register(cls, storage_type: str, storage_class: type):
@@ -310,12 +333,13 @@ class StorageFactory:
         cls._storage_types[storage_type] = storage_class
     
     @classmethod
-    def create(cls, storage_type: str, **kwargs) -> BaseStorage:
+    def create(cls, storage_type: str = None, **kwargs) -> BaseStorage:
         """
         创建存储实例
         
         Args:
             storage_type: 存储类型（sqlite, elasticsearch等）
+                         如果为None，从环境变量STORAGE_TYPE读取
             **kwargs: 存储配置参数
         
         Returns:
@@ -324,6 +348,15 @@ class StorageFactory:
         Raises:
             ValueError: 如果存储类型不支持
         """
+        import os
+        
+        # 自动注册
+        cls._auto_register()
+        
+        # 从环境变量读取
+        if storage_type is None:
+            storage_type = os.getenv('STORAGE_TYPE', 'sqlite')
+        
         if storage_type not in cls._storage_types:
             raise ValueError(
                 f"Unknown storage type: {storage_type}. "
@@ -331,9 +364,45 @@ class StorageFactory:
             )
         
         storage_class = cls._storage_types[storage_type]
+        
+        # 根据存储类型准备配置
+        if storage_type == 'sqlite':
+            if 'db_path' not in kwargs:
+                kwargs['db_path'] = os.getenv('DATABASE_PATH', './data/chatcompass.db')
+        
+        elif storage_type == 'elasticsearch':
+            if 'host' not in kwargs:
+                kwargs['host'] = os.getenv('ELASTICSEARCH_HOST', 'localhost')
+            if 'port' not in kwargs:
+                kwargs['port'] = int(os.getenv('ELASTICSEARCH_PORT', '9200'))
+            if 'index_prefix' not in kwargs:
+                kwargs['index_prefix'] = os.getenv('ELASTICSEARCH_INDEX_PREFIX', 'chatcompass')
+            
+            # 可选的认证信息
+            es_user = os.getenv('ELASTICSEARCH_USER')
+            es_password = os.getenv('ELASTICSEARCH_PASSWORD')
+            if es_user and es_password:
+                kwargs['username'] = es_user
+                kwargs['password'] = es_password
+        
         return storage_class(**kwargs)
+    
+    @classmethod
+    def create_from_config(cls, config_dict: Dict[str, Any]) -> BaseStorage:
+        """
+        从配置字典创建存储实例
+        
+        Args:
+            config_dict: 配置字典
+        
+        Returns:
+            存储实例
+        """
+        storage_type = config_dict.pop('type', 'sqlite')
+        return cls.create(storage_type, **config_dict)
     
     @classmethod
     def get_available_types(cls) -> List[str]:
         """获取所有可用的存储类型"""
+        cls._auto_register()
         return list(cls._storage_types.keys())
