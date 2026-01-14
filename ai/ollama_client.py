@@ -21,19 +21,21 @@ class OllamaClient:
     """Ollama API客户端"""
     
     def __init__(self, 
-                 base_url: str = "http://localhost:11434",
-                 model: str = "qwen2.5:7b",
+                 base_url: str = None,
+                 model: str = None,
                  timeout: int = 60):
         """
         初始化Ollama客户端
         
         Args:
-            base_url: Ollama服务地址
-            model: 使用的模型名称（qwen2.5:7b, llama3.2, mistral等）
+            base_url: Ollama服务地址（默认从环境变量OLLAMA_HOST读取）
+            model: 使用的模型名称（默认从环境变量OLLAMA_MODEL读取，推荐qwen2.5:3b）
             timeout: 请求超时时间（秒）
         """
-        self.base_url = base_url.rstrip('/')
-        self.model = model
+        import os
+        
+        self.base_url = (base_url or os.getenv('OLLAMA_HOST', 'http://localhost:11434')).rstrip('/')
+        self.model = model or os.getenv('OLLAMA_MODEL', 'qwen2.5:3b')
         self.timeout = timeout
         self.api_url = f"{self.base_url}/api/generate"
     
