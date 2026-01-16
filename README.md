@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-65%20Passed-brightgreen.svg)](tests/)
-[![Version](https://img.shields.io/badge/Version-v1.2.6-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v1.2.7-orange.svg)](CHANGELOG.md)
 
 [English](README_EN.md) | [功能特性](#-功能特性) | [快速开始](#-快速开始) | [文档](#-文档索引) | [更新日志](CHANGELOG.md)
 
@@ -246,7 +246,7 @@ python main.py
 $ python main.py
 
 ====================================================================
-ChatCompass - AI对话知识库管理系统 v1.2.6
+ChatCompass - AI对话知识库管理系统 v1.2.7
 ====================================================================
 
 [INFO] 初始化存储后端: sqlite

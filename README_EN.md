@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-65%20Passed-brightgreen.svg)](tests/)
-[![Version](https://img.shields.io/badge/Version-v1.2.6-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v1.2.7-orange.svg)](CHANGELOG.md)
 
 [简体中文](README.md) | [Features](#-features) | [Quick Start](#-quick-start) | [Documentation](#-documentation-index) | [Changelog](CHANGELOG.md)
 
@@ -246,7 +246,7 @@ python main.py
 $ python main.py
 
 ====================================================================
-ChatCompass - AI Conversation Knowledge Base Management System v1.2.6
+ChatCompass - AI Conversation Knowledge Base Management System v1.2.7
 ====================================================================
 
 [INFO] Initialize storage backend: sqlite

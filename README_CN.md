@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Tests](https://img.shields.io/badge/Tests-65%20通过-brightgreen.svg)](tests/)
-[![Version](https://img.shields.io/badge/Version-v1.2.6-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v1.2.7-orange.svg)](CHANGELOG.md)
 
 [English](README.md) | 简体中文
 
