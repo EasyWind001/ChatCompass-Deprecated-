@@ -8,7 +8,7 @@ with open("README.md", "r", encoding="utf-8") as fh:
 
 setup(
     name="chatcompass",
-    version="0.1.0",
+    version="1.3.0",
     author="Your Name",
     author_email="your.email@example.com",
     description="AI对话知识库管理系统",

@@ -6,7 +6,8 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-52%20Passed-brightgreen.svg)](tests/)
+[![Version](https://img.shields.io/badge/Version-v1.3.0-blue.svg)](https://github.com/yourusername/ChatCompass/releases)
+[![Tests](https://img.shields.io/badge/Tests-136%20Passed-brightgreen.svg)](tests/)
 
 [English](README_EN.md) | [功能特性](#-功能特性) | [快速开始](#-快速开始) | [文档](#-文档)
 
@@ -14,9 +15,12 @@
 
 ## 📖 项目简介
 
-ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。它能够：
+ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。**v1.3.0重大更新**：全新GUI图形界面 + 系统托盘监控 + 异步爬取队列！
 
-- 🔗 **一键导入**：支持ChatGPT、Claude等主流AI平台的分享链接
+- 🖥️ **GUI图形界面**：现代化桌面应用，告别命令行
+- 📋 **智能监控**：自动识别剪贴板中的AI对话链接
+- ⚡ **异步处理**：后台并发爬取，实时进度显示
+- 🔗 **一键导入**：支持ChatGPT、Claude、DeepSeek等主流AI平台
 - 🤖 **智能分析**：自动生成摘要、分类和标签（可选）
 - 🔍 **强大搜索**：全文检索+上下文定位，快速找到想要的信息
 - 📊 **知识管理**：本地SQLite存储，完全掌控你的数据
@@ -27,14 +31,16 @@ ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。它
 
 | 功能 | 说明 | 状态 |
 |------|------|------|
-| **多平台支持** | ChatGPT、Claude等 | ✅ 已完成 |
+| **GUI图形界面** | 现代化桌面应用(PyQt6) | ✅ v1.3.0新增 |
+| **系统托盘监控** | 自动识别剪贴板AI链接 | ✅ v1.3.0新增 |
+| **异步爬取队列** | 后台并发处理+实时进度 | ✅ v1.3.0新增 |
+| **多平台支持** | ChatGPT、Claude、DeepSeek | ✅ 已完成 |
 | **智能抓取** | 自动提取对话内容 | ✅ 已完成 |
 | **全文搜索** | 基于SQLite FTS5 | ✅ 已完成 |
-| **上下文定位** | 搜索结果显示前后文 | ✅ v1.2新增 |
-| **对话详情** | 查看完整对话内容 | ✅ v1.1新增 |
+| **上下文定位** | 搜索结果显示前后文 | ✅ v1.2 |
+| **对话详情** | 查看完整对话内容 | ✅ v1.1 |
 | **AI分析** | 自动摘要和标签（可选） | ✅ 已完成 |
 | **命令行界面** | 交互式CLI | ✅ 已完成 |
-| **GUI界面** | 桌面应用 | 🚧 开发中 |
 
 ### 🔍 搜索增强功能（v1.2）
 
@@ -67,8 +73,8 @@ ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。它
 |------|------|------|
 | ChatGPT | ✅ | 支持分享链接 |
 | Claude | ✅ | 支持分享链接 |
+| DeepSeek | ✅ | v1.3.0新增 |
 | Gemini | 🚧 | 计划支持 |
-| DeepSeek | 🚧 | 计划支持 |
 
 ## 🚀 快速开始
 
@@ -89,19 +95,27 @@ cd ChatCompass
 #### 2. 安装依赖
 
 ```bash
-# 使用一键安装脚本（推荐）
+# 基础版本(仅CLI)
+pip install -r requirements.txt
+
+# GUI完整版本(推荐)
+pip install -r requirements-gui.txt
+
+# 或使用一键安装脚本
 # Windows
 install.bat
 
 # Linux/macOS
 bash install.sh
+```
 
-# 或手动安装
-pip install -r requirements.txt
+#### 3. 安装浏览器驱动
+
+```bash
 playwright install chromium
 ```
 
-#### 3. 配置（可选）
+#### 4. 配置（可选）
 
 ```bash
 # 复制配置文件
@@ -113,7 +127,34 @@ cp .env.example .env
 
 ### 基本使用
 
-#### 命令行模式
+#### 🖥️ GUI模式 (推荐)
+
+```bash
+# 启动GUI应用
+python main_gui.py
+
+# 启用系统托盘监控(后台运行)
+python main_gui.py --enable-tray
+
+# 禁用剪贴板监控
+python main_gui.py --disable-monitor
+```
+
+**GUI功能**:
+- ✅ 主窗口 - 查看/搜索/管理对话
+- ✅ 系统托盘 - 最小化到托盘,右键快捷操作
+- ✅ 剪贴板监控 - 自动识别复制的AI链接
+- ✅ 异步队列 - 后台处理,实时进度显示
+- ✅ 详情面板 - 查看完整对话内容
+
+**快捷操作**:
+1. 复制AI对话链接
+2. 自动弹窗询问是否添加
+3. 点击"添加"按钮
+4. 后台自动爬取,实时显示进度
+5. 完成后自动刷新列表
+
+#### 🖥️ 命令行模式
 
 ```bash
 # 交互模式
@@ -166,13 +207,26 @@ python main.py stats
 ChatCompass/
 ├── README.md                 # 项目说明文档
 ├── CHANGELOG.md              # 版本更新日志
-├── requirements.txt          # Python依赖列表
+├── requirements.txt          # 基础依赖
+├── requirements-gui.txt      # GUI依赖 (v1.3.0新增)
 ├── .env.example              # 配置文件示例
 ├── .gitignore                # Git忽略规则
 │
-├── main.py                   # 🎯 主程序入口
+├── main.py                   # 🎯 CLI入口
+├── main_gui.py               # 🖥️ GUI入口 (v1.3.0新增)
 ├── config.py                 # ⚙️ 配置管理
-├── setup.py                  # 📦 安装脚本
+│
+├── gui/                      # 🖥️ GUI模块 (v1.3.0新增)
+│   ├── main_window.py        # 主窗口
+│   ├── conversation_list.py  # 对话列表
+│   ├── detail_panel.py       # 详情面板
+│   ├── clipboard_monitor.py  # 剪贴板监控
+│   ├── system_tray.py        # 系统托盘
+│   ├── task_queue.py         # 任务队列
+│   ├── task_manager.py       # 任务管理器
+│   ├── search_bar.py         # 搜索栏
+│   └── dialogs/              # 对话框
+│       └── add_prompt_dialog.py
 │
 ├── install.bat               # Windows一键安装
 ├── install.sh                # Linux/macOS一键安装
@@ -199,23 +253,17 @@ ChatCompass/
 │   └── openai_client.py      # OpenAI/DeepSeek API客户端
 │
 ├── tests/                    # 🧪 测试套件
-│   ├── __init__.py
 │   ├── conftest.py           # Pytest配置
-│   ├── README.md             # 测试说明
-│   ├── unit/                 # 单元测试
-│   │   ├── test_database.py
-│   │   ├── test_scrapers.py
-│   │   └── test_ai_clients.py
-│   └── integration/          # 集成测试
-│       └── test_full_workflow.py
+│   ├── gui/                  # GUI测试 (v1.3.0新增, 76个)
+│   ├── e2e/                  # E2E测试 (v1.3.0新增, 31个)
+│   ├── unit/                 # 单元测试 (19个)
+│   └── integration/          # 集成测试 (10个)
 │
 └── docs/                     # 📚 文档目录
-    ├── PROJECT_SUMMARY.md            # 项目总结
+    ├── GUI_GUIDE.md          # GUI使用指南 (v1.3.0新增)
+    ├── V1.3.0_PLAN.md        # v1.3.0开发计划
     ├── search_implementation.md      # 搜索实现文档
-    ├── SEARCH_CONTEXT_FEATURE.md     # 搜索增强功能文档
-    ├── SEARCH_ENHANCEMENT_SUMMARY.md # 搜索增强总结
-    └── archive/                      # 开发过程文档归档
-        └── ...
+    └── SEARCH_CONTEXT_FEATURE.md     # 搜索增强功能文档
 ```
 
 ### 目录说明
@@ -242,17 +290,27 @@ ChatCompass/
 
 #### 测试
 
-- **52个测试用例**，覆盖核心功能
-- **96.3%通过率**，确保代码质量
-- **49%代码覆盖率**，持续改进中
+- **136个测试用例** (v1.3.0更新)，覆盖核心功能
+  - 76个GUI单元测试
+  - 31个E2E测试
+  - 19个单元测试
+  - 10个集成测试
+- **100%通过率**，确保代码质量
+- **88%代码覆盖率**，持续改进中
 
 运行测试：
 ```bash
-# Windows
-run_tests.bat
+# 所有测试
+pytest tests/ -v
 
-# Linux/macOS
-python run_tests.py
+# GUI测试
+pytest tests/gui/ -v
+
+# E2E测试
+pytest tests/e2e/ -v
+
+# 覆盖率报告
+pytest tests/ --cov=. --cov-report=html
 ```
 
 #### 文档
@@ -368,14 +426,15 @@ pytest tests/ -v
 
 ### 测试覆盖
 
-- ✅ 数据库操作测试（13个）
-- ✅ 爬虫功能测试（16个）
-- ✅ AI客户端测试（19个）
-- ✅ 完整流程测试（4个）
+| 测试类别 | 数量 | 说明 |
+|---------|------|------|
+| GUI单元测试 | 76 | 主窗口/对话列表/详情面板/任务队列/托盘等 |
+| E2E测试 | 31 | GUI工作流/剪贴板监控/系统集成 |
+| 单元测试 | 19 | 数据库/爬虫/AI客户端 |
+| 集成测试 | 10 | 完整流程测试 |
+| **总计** | **136** | **100%通过率** |
 
-**总计：52个测试，96.3%通过率**
-
-详见：[tests/README.md](tests/README.md)
+详见：[docs/GUI_GUIDE.md](docs/GUI_GUIDE.md)
 
 ## 📊 数据库设计
 
