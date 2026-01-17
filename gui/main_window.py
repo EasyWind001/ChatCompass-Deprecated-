@@ -23,6 +23,8 @@ from gui.detail_panel import DetailPanel
 from gui.dialogs.add_dialog import AddDialog
 from gui.clipboard_monitor import ClipboardMonitor
 from gui.system_tray import SystemTray
+from gui.task_manager import TaskManager
+from gui.widgets.progress_widget import ProgressWidget
 
 
 class MainWindow(QMainWindow):
@@ -33,7 +35,8 @@ class MainWindow(QMainWindow):
     conversation_deleted = pyqtSignal(int)  # 对话删除信号
     
     def __init__(self, db_path: Optional[str] = None, parent=None, 
-                 enable_tray: bool = True, enable_monitor: bool = True):
+                 enable_tray: bool = True, enable_monitor: bool = True,
+                 enable_async: bool = True):
         """
         初始化主窗口
         
@@ -42,6 +45,7 @@ class MainWindow(QMainWindow):
             parent: 父窗口
             enable_tray: 是否启用系统托盘
             enable_monitor: 是否启用剪贴板监控
+            enable_async: 是否启用异步任务队列
         """
         super().__init__(parent)
         
@@ -51,8 +55,11 @@ class MainWindow(QMainWindow):
         # 组件引用
         self.clipboard_monitor: Optional[ClipboardMonitor] = None
         self.system_tray: Optional[SystemTray] = None
+        self.task_manager: Optional[TaskManager] = None
+        self.progress_widget: Optional[ProgressWidget] = None
         self.enable_tray = enable_tray
         self.enable_monitor = enable_monitor
+        self.enable_async = enable_async
         
         # 设置窗口属性
         self.setWindowTitle("ChatCompass - AI对话知识库")
@@ -70,6 +77,7 @@ class MainWindow(QMainWindow):
         # 初始化监控和托盘
         self._init_monitor()
         self._init_tray()
+        self._init_task_manager()
         
         # 加载数据
         self.refresh_list()
@@ -349,6 +357,59 @@ class MainWindow(QMainWindow):
         self.system_tray.show()
         self.statusBar().showMessage("✅ 系统托盘已启动", 2000)
     
+    def _init_task_manager(self):
+        """初始化任务管理器"""
+        if not self.enable_async:
+            return
+        
+        self.task_manager = TaskManager(self.db, max_workers=3)
+        
+        # 创建进度组件
+        self.progress_widget = ProgressWidget()
+        
+        # 连接信号
+        self.task_manager.task_added.connect(self.on_task_added)
+        self.task_manager.task_progress.connect(self.on_task_progress)
+        self.task_manager.task_completed.connect(self.on_task_completed)
+        self.task_manager.task_failed.connect(self.on_task_failed)
+        
+        self.progress_widget.cancel_task.connect(self.task_manager.cancel_task)
+        self.progress_widget.clear_all.connect(self.task_manager.clear_completed)
+        
+        # 启动管理器
+        self.task_manager.start()
+        
+        self.statusBar().showMessage("✅ 异步任务队列已启动", 2000)
+    
+    def on_task_added(self, task_id: str, url: str):
+        """任务添加事件"""
+        if self.progress_widget:
+            self.progress_widget.add_task(task_id, url)
+            # 显示进度组件
+            if not self.progress_widget.isVisible():
+                self.progress_widget.show()
+    
+    def on_task_progress(self, task_id: str, progress: int, message: str):
+        """任务进度事件"""
+        if self.progress_widget:
+            self.progress_widget.update_progress(task_id, progress, message)
+    
+    def on_task_completed(self, task_id: str, result: dict):
+        """任务完成事件"""
+        if self.progress_widget:
+            self.progress_widget.complete_task(task_id, success=True)
+        
+        # 刷新列表
+        self.refresh_list()
+        self.statusBar().showMessage(f"✅ 对话添加成功: {result.get('title', '未知')}", 5000)
+    
+    def on_task_failed(self, task_id: str, error: str):
+        """任务失败事件"""
+        if self.progress_widget:
+            self.progress_widget.complete_task(task_id, success=False)
+        
+        self.statusBar().showMessage(f"❌ 任务失败: {error}", 5000)
+    
     def show_and_activate(self):
         """显示并激活窗口"""
         self.show()
@@ -369,6 +430,10 @@ class MainWindow(QMainWindow):
     
     def quit_app(self):
         """退出应用"""
+        # 停止任务管理器
+        if self.task_manager:
+            self.task_manager.stop()
+        
         # 停止监控
         if self.clipboard_monitor:
             self.clipboard_monitor.stop()
@@ -376,6 +441,10 @@ class MainWindow(QMainWindow):
         # 隐藏托盘
         if self.system_tray:
             self.system_tray.hide()
+        
+        # 关闭进度组件
+        if self.progress_widget:
+            self.progress_widget.close()
         
         # 退出
         from PyQt6.QtWidgets import QApplication

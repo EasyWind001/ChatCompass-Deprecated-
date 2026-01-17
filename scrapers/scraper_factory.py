@@ -29,6 +29,19 @@ class ScraperFactory:
                 return scraper
         return None
     
+    @staticmethod
+    def create_scraper(platform: str) -> Optional[BaseScraper]:
+        """根据平台名称创建爬虫"""
+        platform_lower = platform.lower()
+        
+        if platform_lower in ['chatgpt', 'openai']:
+            return ChatGPTScraper(use_playwright=True)
+        elif platform_lower in ['claude', 'anthropic']:
+            return ClaudeScraper(use_playwright=True)
+        # 可扩展更多平台
+        
+        return None
+    
     def scrape(self, url: str) -> ConversationData:
         """自动识别并抓取"""
         scraper = self.get_scraper(url)
