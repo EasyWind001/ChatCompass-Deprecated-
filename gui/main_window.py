@@ -35,7 +35,7 @@ class MainWindow(QMainWindow):
     conversation_added = pyqtSignal(dict)  # 对话添加信号
     conversation_deleted = pyqtSignal(int)  # 对话删除信号
     
-    def __init__(self, db_path: Optional[str] = None, parent=None, 
+    def __init__(self, db_path: Optional[str] = None, db=None, parent=None, 
                  enable_tray: bool = True, enable_monitor: bool = True,
                  enable_async: bool = True):
         """
@@ -43,6 +43,7 @@ class MainWindow(QMainWindow):
         
         Args:
             db_path: 数据库路径 (可选)
+            db: 数据库对象 (可选,用于测试)
             parent: 父窗口
             enable_tray: 是否启用系统托盘
             enable_monitor: 是否启用剪贴板监控
@@ -51,7 +52,12 @@ class MainWindow(QMainWindow):
         super().__init__(parent)
         
         # 数据库连接
-        self.db = get_storage(db_path) if db_path else get_storage()
+        if db is not None:
+            self.db = db  # 直接使用传入的db对象(测试用)
+        elif db_path:
+            self.db = get_storage(db_path)
+        else:
+            self.db = get_storage()
         
         # 组件引用
         self.clipboard_monitor: Optional[ClipboardMonitor] = None
