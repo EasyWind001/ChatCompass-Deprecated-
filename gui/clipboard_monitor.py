@@ -32,10 +32,10 @@ class ClipboardMonitor(QObject):
     
     # 支持的AI对话平台URL模式
     AI_URL_PATTERNS = [
-        r'https?://chat\.openai\.com/c/[\w-]+',
-        r'https?://chatgpt\.com/share/[\w-]+',
-        r'https?://claude\.ai/chat/[\w-]+',
-        r'https?://chat\.deepseek\.com/share/[\w-]+',  # 修复: DeepSeek分享链接格式
+        r'https?://chat\.openai\.com/share/[\w-]+',  # ChatGPT分享链接
+        r'https?://chatgpt\.com/share/[\w-]+',       # ChatGPT新域名
+        r'https?://claude\.ai/share/[\w-]+',         # Claude分享链接
+        r'https?://chat\.deepseek\.com/share/[\w-]+',  # DeepSeek分享链接
         r'https?://kimi\.moonshot\.cn/share/[\w-]+',
         r'https?://poe\.com/s/[\w-]+',
         r'https?://gemini\.google\.com/share/[\w-]+',

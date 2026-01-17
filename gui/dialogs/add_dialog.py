@@ -12,6 +12,7 @@ from PyQt6.QtWidgets import (
 from PyQt6.QtCore import Qt, QThread, pyqtSignal
 
 from scrapers.scraper_factory import ScraperFactory
+from gui.error_handler import handle_error, handle_warning
 
 
 class ScraperThread(QThread):
@@ -31,8 +32,9 @@ class ScraperThread(QThread):
         try:
             self.progress.emit("🔍 识别平台...")
             
-            # 创建爬虫
-            scraper = ScraperFactory.create_scraper(self.url)
+            # 创建爬虫工厂并根据URL获取爬虫
+            factory = ScraperFactory()
+            scraper = factory.get_scraper(self.url)
             if not scraper:
                 self.error.emit("不支持的URL格式")
                 return
@@ -131,11 +133,11 @@ class AddDialog(QDialog):
         
         # 验证URL
         if not url:
-            QMessageBox.warning(self, "警告", "请输入URL")
+            handle_warning("请输入URL", parent=self)
             return
             
         if not url.startswith('http'):
-            QMessageBox.warning(self, "警告", "URL格式无效")
+            handle_warning("URL格式无效", parent=self)
             return
             
         # 禁用输入
@@ -164,7 +166,13 @@ class AddDialog(QDialog):
             # 保存到数据库
             self.log_text.append("💾 保存到数据库...")
             
-            conv_id = self.db.add_conversation(conversation)
+            # 使用正确的数据库API
+            conv_id = self.db.add_conversation(
+                source_url=conversation.get('url', ''),
+                platform=conversation.get('platform', 'unknown'),
+                title=conversation.get('title', '未知标题'),
+                raw_content=conversation  # 传递完整的conversation字典
+            )
             conversation['id'] = conv_id
             
             self.conversation = conversation
@@ -176,9 +184,9 @@ class AddDialog(QDialog):
             self.accept()
             
         except Exception as e:
-            self._on_error(f"保存失败: {str(e)}")
+            self._on_error(f"保存失败: {str(e)}", e)
             
-    def _on_error(self, error_msg: str):
+    def _on_error(self, error_msg: str, exception: Exception = None):
         """错误处理"""
         self.progress_bar.setVisible(False)
         self.log_text.append(f"❌ {error_msg}")
@@ -187,7 +195,15 @@ class AddDialog(QDialog):
         self.url_input.setEnabled(True)
         self.add_btn.setEnabled(True)
         
-        QMessageBox.critical(self, "错误", error_msg)
+        # 使用统一错误处理
+        if exception:
+            handle_error(
+                exception,
+                parent=self,
+                user_message=error_msg
+            )
+        else:
+            handle_warning(error_msg, parent=self, title="错误")
         
     def get_conversation(self) -> Optional[Dict[str, Any]]:
         """
