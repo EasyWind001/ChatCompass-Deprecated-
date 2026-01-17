@@ -6,6 +6,7 @@ from typing import Optional
 from .base_scraper import BaseScraper, ConversationData
 from .chatgpt_scraper import ChatGPTScraper
 from .claude_scraper import ClaudeScraper
+from .deepseek_scraper import DeepSeekScraper
 
 
 class ScraperFactory:
@@ -16,9 +17,9 @@ class ScraperFactory:
         self.scrapers = [
             ChatGPTScraper(use_playwright=True),
             ClaudeScraper(use_playwright=True),
+            DeepSeekScraper(use_playwright=True),
             # 未来可以添加更多平台：
             # GeminiScraper(),
-            # DeepSeekScraper(),
             # KimiScraper(),
         ]
     
@@ -38,6 +39,8 @@ class ScraperFactory:
             return ChatGPTScraper(use_playwright=True)
         elif platform_lower in ['claude', 'anthropic']:
             return ClaudeScraper(use_playwright=True)
+        elif platform_lower in ['deepseek']:
+            return DeepSeekScraper(use_playwright=True)
         # 可扩展更多平台
         
         return None
@@ -48,7 +51,7 @@ class ScraperFactory:
         
         if not scraper:
             raise ValueError(f"不支持的链接格式: {url}\n"
-                           f"目前支持的平台: ChatGPT, Claude")
+                           f"目前支持的平台: ChatGPT, Claude, DeepSeek")
         
         print(f"识别到平台: {scraper.platform_name.upper()}")
         return scraper.scrape(url)

@@ -4,6 +4,7 @@
 from .base_scraper import BaseScraper, ConversationData, Message
 from .chatgpt_scraper import ChatGPTScraper
 from .claude_scraper import ClaudeScraper
+from .deepseek_scraper import DeepSeekScraper
 from .scraper_factory import ScraperFactory
 
 __all__ = [
@@ -12,5 +13,6 @@ __all__ = [
     'Message',
     'ChatGPTScraper',
     'ClaudeScraper',
+    'DeepSeekScraper',
     'ScraperFactory'
 ]
