@@ -25,6 +25,7 @@ from gui.clipboard_monitor import ClipboardMonitor
 from gui.system_tray import SystemTray
 from gui.task_manager import TaskManager
 from gui.widgets.progress_widget import ProgressWidget
+from gui.widgets.search_bar import SearchBar
 
 
 class MainWindow(QMainWindow):
@@ -90,7 +91,11 @@ class MainWindow(QMainWindow):
         
         # 主布局
         main_layout = QVBoxLayout(central_widget)
-        main_layout.setContentsMargins(0, 0, 0, 0)
+        main_layout.setContentsMargins(5, 5, 5, 5)
+        
+        # 搜索栏
+        self.search_bar = SearchBar()
+        main_layout.addWidget(self.search_bar)
         
         # 分割器 (列表 | 详情)
         splitter = QSplitter(Qt.Orientation.Horizontal)
@@ -247,6 +252,11 @@ class MainWindow(QMainWindow):
         # 对话删除 -> 刷新列表
         self.conversation_deleted.connect(lambda: self.refresh_list())
         
+        # 搜索栏信号
+        self.search_bar.search_requested.connect(self._on_search_bar)
+        self.search_bar.platform_filter_changed.connect(self._on_platform_filter)
+        self.search_bar.clear_search.connect(self.refresh_list)
+        
     def show_add_dialog(self):
         """显示添加对话框"""
         dialog = AddDialog(self.db, self)
@@ -304,6 +314,22 @@ class MainWindow(QMainWindow):
         """搜索按钮点击处理"""
         keyword = self.search_widget.text()
         self.search_conversations(keyword)
+    
+    def _on_search_bar(self, keyword: str):
+        """搜索栏搜索处理"""
+        if not keyword.strip():
+            self.refresh_list()
+        else:
+            self.conversation_list.filter_by_title(keyword)
+            self.statusBar().showMessage(f"🔍 搜索: {keyword}", 2000)
+    
+    def _on_platform_filter(self, platform: str):
+        """平台过滤处理"""
+        if not platform:
+            self.refresh_list()
+        else:
+            self.conversation_list.filter_by_platform(platform)
+            self.statusBar().showMessage(f"🔍 平台: {platform}", 2000)
         
     def _update_stats(self):
         """更新统计信息"""
@@ -313,6 +339,34 @@ class MainWindow(QMainWindow):
             self.stats_label.setText(f"总计: {total} 条对话")
         except Exception:
             self.stats_label.setText("总计: 0 条对话")
+    
+    def delete_conversation(self):
+        """删除选中的对话"""
+        selected = self.conversation_list.get_selected_conversation()
+        if not selected:
+            QMessageBox.warning(self, "警告", "请先选择要删除的对话")
+            return
+        
+        conv_id = selected.get('id')
+        title = selected.get('title', 'Unknown')
+        
+        # 确认删除
+        reply = QMessageBox.question(
+            self,
+            "确认删除",
+            f"确定要删除对话:\n{title}\n\n此操作不可恢复!",
+            QMessageBox.StandardButton.Yes | QMessageBox.StandardButton.No
+        )
+        
+        if reply == QMessageBox.StandardButton.Yes:
+            try:
+                self.db.delete_conversation(conv_id)
+                self.conversation_deleted.emit(conv_id)
+                self.statusBar().showMessage(f"✅ 已删除: {title}", 3000)
+                # 清空详情面板
+                self.detail_panel._clear()
+            except Exception as e:
+                QMessageBox.critical(self, "错误", f"删除失败: {str(e)}")
             
     def show_about(self):
         """显示关于对话框"""
