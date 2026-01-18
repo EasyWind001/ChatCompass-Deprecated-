@@ -100,24 +100,16 @@ class TaskManagerThread(QThread):
             
             self.task_progress.emit(task_id, 70, "正在保存到数据库...")
             
-            # 保存到数据库
+            # 保存到数据库 (使用正确的API)
             conversation_id = self.storage.add_conversation(
-                url=task['url'],
+                source_url=task['url'],
                 platform=task['platform'],
                 title=result.get('title', '未知标题'),
-                metadata=result.get('metadata', {})
+                raw_content=result  # 传递完整的result作为raw_content
             )
             
-            # 保存消息
-            messages = result.get('messages', [])
-            for msg in messages:
-                self.storage.add_message(
-                    conversation_id=conversation_id,
-                    role=msg.get('role', 'user'),
-                    content=msg.get('content', ''),
-                    index=msg.get('index', 0),
-                    metadata=msg.get('metadata', {})
-                )
+            # 消息已经包含在raw_content中,不需要单独保存
+            message_count = len(result.get('messages', []))
             
             self.task_progress.emit(task_id, 100, "✅ 完成")
             
@@ -125,7 +117,7 @@ class TaskManagerThread(QThread):
             self.task_queue.update_task_status(task_id, TaskStatus.COMPLETED.value)
             self.task_queue.tasks[task_id]['result'] = {
                 'conversation_id': conversation_id,
-                'message_count': len(messages)
+                'message_count': message_count
             }
             
             # 发送完成信号

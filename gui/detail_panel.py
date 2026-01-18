@@ -15,6 +15,27 @@ from PyQt6.QtCore import Qt
 class DetailPanel(QWidget):
     """对话详情面板"""
     
+    @staticmethod
+    def _parse_raw_content(raw_content) -> dict:
+        """
+        解析raw_content,兼容str和dict类型
+        
+        Args:
+            raw_content: 可能是JSON字符串或字典
+            
+        Returns:
+            解析后的字典
+        """
+        if isinstance(raw_content, str):
+            try:
+                return json.loads(raw_content)
+            except:
+                return {}
+        elif isinstance(raw_content, dict):
+            return raw_content
+        else:
+            return {}
+    
     def __init__(self, db, parent=None):
         """
         初始化详情面板
@@ -154,9 +175,9 @@ class DetailPanel(QWidget):
             
             # 更新统计信息
             # 解析raw_content获取消息数
-            raw_content = conversation.get('raw_content', '{}')
+            raw_content = conversation.get('raw_content', {})
             try:
-                content_data = json.loads(raw_content)
+                content_data = self._parse_raw_content(raw_content)
                 messages = content_data.get('messages', [])
                 message_count = len(messages)
             except:
@@ -188,15 +209,15 @@ class DetailPanel(QWidget):
             self._clear()
             self.content_text.setPlainText(f"加载失败: {str(e)}")
             
-    def _load_conversation_content(self, raw_content: str):
+    def _load_conversation_content(self, raw_content):
         """
         加载对话内容
         
         Args:
-            raw_content: 原始对话JSON
+            raw_content: 原始对话数据(可能是JSON字符串或字典)
         """
         try:
-            content_data = json.loads(raw_content)
+            content_data = self._parse_raw_content(raw_content)
             messages = content_data.get('messages', [])
             
             html_parts = []

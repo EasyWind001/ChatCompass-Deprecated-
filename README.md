@@ -34,6 +34,7 @@ ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。**v
 | **GUI图形界面** | 现代化桌面应用(PyQt6) | ✅ v1.3.0新增 |
 | **系统托盘监控** | 自动识别剪贴板AI链接 | ✅ v1.3.0新增 |
 | **异步爬取队列** | 后台并发处理+实时进度 | ✅ v1.3.0新增 |
+| **错误日志系统** | 完善的错误追踪和日志记录 | ✅ v1.3.0新增 |
 | **多平台支持** | ChatGPT、Claude、DeepSeek | ✅ 已完成 |
 | **智能抓取** | 自动提取对话内容 | ✅ 已完成 |
 | **全文搜索** | 基于SQLite FTS5 | ✅ 已完成 |
@@ -224,9 +225,14 @@ ChatCompass/
 │   ├── system_tray.py        # 系统托盘
 │   ├── task_queue.py         # 任务队列
 │   ├── task_manager.py       # 任务管理器
-│   ├── search_bar.py         # 搜索栏
+│   ├── error_handler.py      # 错误处理 (v1.3.0新增)
+│   ├── widgets/              # 组件
+│   │   ├── search_bar.py
+│   │   └── progress_widget.py
 │   └── dialogs/              # 对话框
-│       └── add_prompt_dialog.py
+│       ├── add_dialog.py
+│       ├── add_prompt_dialog.py
+│       └── error_viewer.py   # 错误查看器 (v1.3.0新增)
 │
 ├── install.bat               # Windows一键安装
 ├── install.sh                # Linux/macOS一键安装
@@ -261,7 +267,9 @@ ChatCompass/
 │
 └── docs/                     # 📚 文档目录
     ├── GUI_GUIDE.md          # GUI使用指南 (v1.3.0新增)
+    ├── ERROR_HANDLING_GUIDE.md  # 错误处理指南 (v1.3.0新增)
     ├── V1.3.0_PLAN.md        # v1.3.0开发计划
+    ├── V1.3.0_ERROR_HANDLING_IMPLEMENTATION.md  # 错误处理实施报告
     ├── search_implementation.md      # 搜索实现文档
     └── SEARCH_CONTEXT_FEATURE.md     # 搜索增强功能文档
 ```
@@ -411,7 +419,36 @@ ChatCompass> list --category 编程
 
 项目包含完整的测试套件，确保代码质量。
 
-### 运行测试
+### 🧪 测试框架 (v1.3.0新增)
+
+ChatCompass配备了完善的测试基础设施:
+
+#### 渐进式测试系统 ⭐ NEW
+
+**核心理念**: 遇错即停 → 查看详情 → 修复验证 → 继续测试
+
+```bash
+# 交互式测试 (推荐)
+python run_tests_interactive.py
+
+# 快速模式
+python run_tests_interactive.py --quick
+
+# 测试特定模块
+python run_tests_interactive.py tests/unit/test_db_manager.py
+```
+
+**特性**:
+- ✅ 遇到错误立即暂停
+- ✅ 显示完整错误堆栈
+- ✅ 检查应用层错误历史
+- ✅ 交互式修复验证
+- ✅ 导出错误日志
+- ✅ 提升37.5%测试效率
+
+详见: [`docs/PROGRESSIVE_TESTING_GUIDE.md`](docs/PROGRESSIVE_TESTING_GUIDE.md)
+
+#### 传统测试模式
 
 ```bash
 # Windows

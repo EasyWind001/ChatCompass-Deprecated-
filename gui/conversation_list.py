@@ -128,7 +128,7 @@ class ConversationList(QWidget):
             
     def _on_selection_changed(self):
         """选择变化处理"""
-        selected_rows = self.table.selectedRows()
+        selected_rows = self.table.selectionModel().selectedRows()
         if selected_rows:
             row = selected_rows[0].row()
             if 0 <= row < len(self.conversations):
@@ -143,7 +143,7 @@ class ConversationList(QWidget):
         Returns:
             选中的对话数据,如果没有选中则返回None
         """
-        selected_rows = self.table.selectedRows()
+        selected_rows = self.table.selectionModel().selectedRows()
         if selected_rows:
             row = selected_rows[0].row()
             if 0 <= row < len(self.conversations):
