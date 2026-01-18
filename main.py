@@ -16,9 +16,9 @@ if sys.platform == 'win32':
 PROJECT_ROOT = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
-from database.storage_adapter import StorageAdapter
+from database.db_manager import DatabaseManager
 from scrapers.scraper_factory import ScraperFactory
-from config import get_storage, get_ai_service, STORAGE_TYPE
+from config import get_ai_client, DATABASE_PATH
 
 
 class ChatCompass:
@@ -26,39 +26,22 @@ class ChatCompass:
     
     def __init__(self):
         print("=" * 60)
-        print("ChatCompass - AI对话知识库管理系统 v1.2.2")
+        print("ChatCompass - AI对话知识库管理系统")
         print("=" * 60)
         
-        # 初始化存储（自动选择SQLite或Elasticsearch）
-        print(f"\n[INFO] 初始化存储后端: {STORAGE_TYPE}")
-        try:
-            storage = get_storage()
-            self.db = StorageAdapter(storage)
-            print(f"[OK] 存储初始化成功: {storage.__class__.__name__}")
-        except Exception as e:
-            print(f"[ERROR] 存储初始化失败: {e}")
-            raise
+        # 初始化数据库
+        self.db = DatabaseManager(DATABASE_PATH)
         
         # 初始化爬虫工厂
         self.scraper_factory = ScraperFactory()
         
-        # 初始化AI服务（统一使用新的AIService）
-        print(f"[INFO] 初始化AI服务...")
+        # 初始化AI客户端
         try:
-            self.ai_service = get_ai_service()
-            
-            # 检查AI服务状态
-            if self.ai_service.is_available():
-                status = self.ai_service.get_status()
-                print(f"[OK] AI服务已就绪")
-                print(f"    - 后端: {status['backend']}")
-                print(f"    - 模型: {status.get('model', 'N/A')}")
-            else:
-                print(f"[WARN] AI服务不可用（将跳过AI分析）")
-                self.ai_service = None
+            self.ai_client = get_ai_client()
+            print(f"[OK] AI客户端初始化成功: {self.ai_client.__class__.__name__}")
         except Exception as e:
-            print(f"[WARN] AI服务初始化失败: {e}")
-            self.ai_service = None
+            print(f"[WARN] AI客户端初始化失败: {e}")
+            self.ai_client = None
     
     def add_conversation_from_url(self, url: str):
         """从URL添加对话"""
@@ -77,34 +60,24 @@ class ChatCompass:
             category = None
             tags = []
             
-            if self.ai_service:
+            if self.ai_client:
                 print("  [2/3] AI分析中...")
                 try:
                     full_text = conversation_data.get_full_text()
+                    analysis = self.ai_client.analyze_conversation(full_text)
                     
-                    # 使用新的AI服务进行分析
-                    analysis = self.ai_service.analyze_conversation(
-                        full_text, 
-                        conversation_data.title
-                    )
+                    summary = analysis.summary
+                    category = analysis.category
+                    tags = analysis.tags
                     
-                    if analysis:
-                        summary = analysis.summary
-                        category = analysis.category
-                        tags = analysis.tags
-                        
-                        print(f"  [OK] 分析完成")
-                        print(f"      - 摘要: {summary[:50]}..." if summary else "      - 摘要: (空)")
-                        print(f"      - 分类: {category}" if category else "      - 分类: (未分类)")
-                        print(f"      - 标签: {', '.join(tags)}" if tags else "      - 标签: (无)")
-                    else:
-                        print(f"  [WARN] AI分析未返回结果")
+                    print(f"  [OK] 分析完成")
+                    print(f"      - 摘要: {summary[:50]}...")
+                    print(f"      - 分类: {category}")
+                    print(f"      - 标签: {', '.join(tags)}")
                 except Exception as e:
                     print(f"  [WARN] AI分析失败: {e}")
-                    import traceback
-                    traceback.print_exc()
             else:
-                print("  [2/3] 跳过AI分析（服务不可用）")
+                print("  [2/3] 跳过AI分析（未配置）")
             
             # 3. 保存到数据库
             print("  [3/3] 保存到数据库...")
@@ -180,54 +153,6 @@ class ChatCompass:
             print(f"      💡 输入 'show {result['id']}' 查看完整对话")
             print()
     
-    def delete_conversation(self, identifier: str):
-        """删除单个对话
-        
-        Args:
-            identifier: 对话ID或URL
-        """
-        # 尝试作为ID查询
-        conversation = self.db.get_conversation(identifier)
-        
-        # 如果未找到，尝试作为URL查询
-        if not conversation:
-            conversation = self.db.get_conversation_by_url(identifier)
-        
-        if not conversation:
-            print(f"\n❌ 未找到对话: {identifier}")
-            print("提示: 使用 'list' 命令查看所有对话")
-            return False
-        
-        # 显示将要删除的对话信息
-        print("\n" + "=" * 70)
-        print(f"⚠️  确认删除对话")
-        print("=" * 70)
-        print(f"ID: {conversation['id']}")
-        print(f"标题: {conversation['title']}")
-        print(f"平台: {conversation['platform']}")
-        print(f"创建时间: {conversation['created_at']}")
-        
-        # 询问确认
-        try:
-            confirm = input("\n确定删除吗？(yes/no): ").strip().lower()
-        except (KeyboardInterrupt, EOFError):
-            print("\n\n❌ 已取消删除")
-            return False
-        
-        if confirm not in ['yes', 'y']:
-            print("\n❌ 已取消删除")
-            return False
-        
-        # 执行删除
-        success = self.db.delete_conversation(conversation['id'])
-        
-        if success:
-            print(f"\n✅ 删除成功: {conversation['title']}")
-            return True
-        else:
-            print(f"\n❌ 删除失败")
-            return False
-    
     def show_statistics(self):
         """显示统计信息"""
         stats = self.db.get_statistics()
@@ -259,11 +184,18 @@ class ChatCompass:
         import json
         
         # 尝试作为ID查询
-        conversation = self.db.get_conversation(identifier)
+        conversation = None
+        if identifier.isdigit():
+            conv_id = int(identifier)
+            conversation = self.db.get_conversation(conv_id)
         
-        # 如果未找到，尝试作为URL查询
+        # 如果不是数字或未找到，尝试作为URL查询
         if not conversation:
-            conversation = self.db.get_conversation_by_url(identifier)
+            cursor = self.db.conn.cursor()
+            cursor.execute("SELECT * FROM conversations WHERE source_url = ?", (identifier,))
+            row = cursor.fetchone()
+            if row:
+                conversation = dict(row)
         
         if not conversation:
             print(f"\n未找到对话: {identifier}")
@@ -363,7 +295,6 @@ class ChatCompass:
   search <keyword> - 搜索对话
   list             - 列出最近的对话
   show <id|url>    - 查看对话详细内容
-  delete <id|url>  - 删除对话（需要确认）
   stats            - 显示统计信息
   help             - 显示帮助
   exit             - 退出程序
@@ -372,8 +303,6 @@ class ChatCompass:
   show 1                          - 查看ID为1的对话
   show 4                          - 查看ID为4的对话
   show https://chatgpt.com/...    - 通过URL查看对话
-  delete 1                        - 删除ID为1的对话
-  delete https://chatgpt.com/...  - 通过URL删除对话
                     """)
                 
                 elif command.startswith('add '):
@@ -391,14 +320,6 @@ class ChatCompass:
                     else:
                         print("请指定对话ID或URL")
                         print("示例: show 1  或  show https://chatgpt.com/...")
-                
-                elif command.startswith('delete '):
-                    identifier = command[7:].strip()
-                    if identifier:
-                        self.delete_conversation(identifier)
-                    else:
-                        print("请指定对话ID或URL")
-                        print("示例: delete 1  或  delete https://chatgpt.com/...")
                 
                 elif command == 'list':
                     conversations = self.db.get_all_conversations(limit=10)
@@ -451,10 +372,6 @@ def main():
             identifier = sys.argv[2]
             app.show_conversation(identifier)
         
-        elif command == 'delete' and len(sys.argv) > 2:
-            identifier = sys.argv[2]
-            app.delete_conversation(identifier)
-        
         elif command == 'stats':
             app.show_statistics()
         
@@ -463,7 +380,7 @@ def main():
             # TODO: 启动PyQt6 GUI
         
         else:
-            print(f"用法: python main.py [add <url> | search <keyword> | show <id|url> | delete <id|url> | stats | gui]")
+            print(f"用法: python main.py [add <url> | search <keyword> | show <id|url> | stats | gui]")
     
     else:
         # 无参数时进入交互模式

@@ -6,235 +6,646 @@
 
 [![Python](https://img.shields.io/badge/Python-3.9+-blue.svg)](https://www.python.org/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Tests](https://img.shields.io/badge/Tests-65%20Passed-brightgreen.svg)](tests/)
-[![Version](https://img.shields.io/badge/Version-v1.2.7-orange.svg)](CHANGELOG.md)
+[![Version](https://img.shields.io/badge/Version-v1.3.0-blue.svg)](https://github.com/yourusername/ChatCompass/releases)
+[![Tests](https://img.shields.io/badge/Tests-136%20Passed-brightgreen.svg)](tests/)
 
-[English](README_EN.md) | [快速开始](#-快速开始) | [文档](DOCUMENTATION_INDEX.md) | [更新日志](CHANGELOG.md)
+[English](README_EN.md) | [功能特性](#-功能特性) | [快速开始](#-快速开始) | [文档](#-文档)
 
 </div>
 
 ## 📖 项目简介
 
-ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。
+ChatCompass 是一款专为管理AI对话而设计的本地知识库系统。**v1.3.0重大更新**：全新GUI图形界面 + 系统托盘监控 + 异步爬取队列！
 
-**核心能力：**
+- 🖥️ **GUI图形界面**：现代化桌面应用，告别命令行
+- 📋 **智能监控**：自动识别剪贴板中的AI对话链接
+- ⚡ **异步处理**：后台并发爬取，实时进度显示
 - 🔗 **一键导入**：支持ChatGPT、Claude、DeepSeek等主流AI平台
-- 🔍 **智能搜索**：全文检索+上下文定位，快速找到想要的信息
-- 🤖 **AI分析**：自动生成摘要、分类和标签（可选）
-- 📊 **灵活存储**：SQLite/Elasticsearch双引擎
-- 🐳 **Docker部署**：一键启动完整环境
+- 🤖 **智能分析**：自动生成摘要、分类和标签（可选）
+- 🔍 **强大搜索**：全文检索+上下文定位，快速找到想要的信息
+- 📊 **知识管理**：本地SQLite存储，完全掌控你的数据
 
 ## ✨ 功能特性
 
-### 核心功能
+### 🎯 核心功能
 
 | 功能 | 说明 | 状态 |
 |------|------|------|
+| **GUI图形界面** | 现代化桌面应用(PyQt6) | ✅ v1.3.0新增 |
+| **系统托盘监控** | 自动识别剪贴板AI链接 | ✅ v1.3.0新增 |
+| **异步爬取队列** | 后台并发处理+实时进度 | ✅ v1.3.0新增 |
+| **错误日志系统** | 完善的错误追踪和日志记录 | ✅ v1.3.0新增 |
 | **多平台支持** | ChatGPT、Claude、DeepSeek | ✅ 已完成 |
 | **智能抓取** | 自动提取对话内容 | ✅ 已完成 |
-| **全文搜索** | 上下文定位+高亮显示 | ✅ v1.2 |
-| **对话管理** | 查看/删除/标签管理 | ✅ 已完成 |
-| **AI分析** | 本地/在线AI支持 | ✅ v1.2.2 |
-| **Docker部署** | 一键启动所有服务 | ✅ v1.2.2 |
+| **全文搜索** | 基于SQLite FTS5 | ✅ 已完成 |
+| **上下文定位** | 搜索结果显示前后文 | ✅ v1.2 |
+| **对话详情** | 查看完整对话内容 | ✅ v1.1 |
+| **AI分析** | 自动摘要和标签（可选） | ✅ 已完成 |
+| **命令行界面** | 交互式CLI | ✅ 已完成 |
 
-### 支持的平台
+### 🔍 搜索增强功能（v1.2）
 
-| 平台 | 状态 | URL格式 |
-|------|------|---------|
-| ChatGPT | ✅ | `https://chatgpt.com/share/xxx` |
-| Claude | ✅ | `https://claude.ai/share/xxx` |
-| DeepSeek | ✅ | `https://chat.deepseek.com/share/xxx` |
-| Gemini | 🚧 | 计划中 |
+- **上下文显示**：搜索结果显示匹配片段的前后80字符
+- **精确定位**：标注匹配位置（第几条消息）
+- **关键词高亮**：用【】包裹关键词
+- **角色区分**：区分用户👤和助手🤖的消息
+- **多处匹配**：支持一个对话中的多处匹配展示
+
+**搜索效果示例：**
+```
+🔍 搜索: Python
+
+  [1] 📄 Python数据分析教程
+      💬 平台: chatgpt | 📁 分类: 编程
+      📍 找到 2 处匹配:
+
+         🤖 助手 (第 2/5 条消息)
+         ...学习【Python】数据分析，建议从Pandas和NumPy开始...
+
+         🤖 助手 (第 4/5 条消息)
+         ...【Python】在数据科学领域非常流行，因为...
+
+      💡 输入 'show 1' 查看完整对话
+```
+
+### 📦 支持的平台
+
+| 平台 | 状态 | 说明 |
+|------|------|------|
+| ChatGPT | ✅ | 支持分享链接 |
+| Claude | ✅ | 支持分享链接 |
+| DeepSeek | ✅ | v1.3.0新增 |
+| Gemini | 🚧 | 计划支持 |
 
 ## 🚀 快速开始
 
-### 安装（3步完成）
+### 前置要求
+
+- Python 3.9 或更高版本
+- Windows / macOS / Linux
+
+### 安装步骤
+
+#### 1. 克隆项目
 
 ```bash
-# 1. 克隆项目
 git clone https://github.com/yourusername/ChatCompass.git
 cd ChatCompass
+```
 
-# 2. 安装依赖（Windows用户使用install.bat）
+#### 2. 安装依赖
+
+```bash
+# 基础版本(仅CLI)
+pip install -r requirements.txt
+
+# GUI完整版本(推荐)
+pip install -r requirements-gui.txt
+
+# 或使用一键安装脚本
+# Windows
+install.bat
+
+# Linux/macOS
 bash install.sh
+```
 
-# 3. 开始使用
-python main.py
+#### 3. 安装浏览器驱动
+
+```bash
+playwright install chromium
+```
+
+#### 4. 配置（可选）
+
+```bash
+# 复制配置文件
+cp .env.example .env
+
+# 编辑.env，配置AI功能（可选）
+# 不配置也能正常使用，只是没有自动摘要功能
 ```
 
 ### 基本使用
 
+#### 🖥️ GUI模式 (推荐)
+
 ```bash
-# 添加对话
+# 启动GUI应用
+python main_gui.py
+
+# 启用系统托盘监控(后台运行)
+python main_gui.py --enable-tray
+
+# 禁用剪贴板监控
+python main_gui.py --disable-monitor
+```
+
+**GUI功能**:
+- ✅ 主窗口 - 查看/搜索/管理对话
+- ✅ 系统托盘 - 最小化到托盘,右键快捷操作
+- ✅ 剪贴板监控 - 自动识别复制的AI链接
+- ✅ 异步队列 - 后台处理,实时进度显示
+- ✅ 详情面板 - 查看完整对话内容
+
+**快捷操作**:
+1. 复制AI对话链接
+2. 自动弹窗询问是否添加
+3. 点击"添加"按钮
+4. 后台自动爬取,实时显示进度
+5. 完成后自动刷新列表
+
+#### 🖥️ 命令行模式
+
+```bash
+# 交互模式
+python main.py
+
+# 直接添加对话
 python main.py add "https://chatgpt.com/share/xxxxx"
 
 # 搜索对话
 python main.py search "Python教程"
 
-# 查看详情
+# 查看对话详情
 python main.py show 1
 
-# 删除对话
-python main.py delete 1
-
-# 查看统计
+# 查看统计信息
 python main.py stats
 ```
 
-### 交互模式
+#### 交互模式
 
-```bash
+```
 $ python main.py
 
-ChatCompass> add https://chatgpt.com/share/xxxxx
-ChatCompass> search Python
-ChatCompass> show 1
-ChatCompass> exit
+ChatCompass> help         # 查看帮助
+ChatCompass> list         # 列出所有对话
+ChatCompass> search Python  # 搜索
+ChatCompass> show 1       # 查看详情
+ChatCompass> exit         # 退出
 ```
 
-### Docker部署（可选）
+### 使用示例
 
 ```bash
-# 一键启动（推荐）
-./docker-start.sh        # Linux/Mac
-.\docker-start.bat       # Windows
+# 1. 添加ChatGPT对话
+python main.py add "https://chatgpt.com/share/6964e4ba-8264-8010-99ad-ab2399bb1dca"
 
-# 或手动启动
-docker-compose up -d
-docker exec -it chatcompass-app python main.py
+# 2. 搜索相关对话
+python main.py search "编程"
+
+# 3. 查看详细内容
+python main.py show 1
+
+# 4. 查看统计
+python main.py stats
 ```
-
-📖 详细说明：[Docker快速入门](docs/DOCKER_QUICKSTART.md)
 
 ## 📁 项目结构
 
 ```
 ChatCompass/
-├── main.py                   # 主程序入口
-├── config.py                 # 配置管理
-├── requirements.txt          # Python依赖
+├── README.md                 # 项目说明文档
+├── CHANGELOG.md              # 版本更新日志
+├── requirements.txt          # 基础依赖
+├── requirements-gui.txt      # GUI依赖 (v1.3.0新增)
+├── .env.example              # 配置文件示例
+├── .gitignore                # Git忽略规则
 │
-├── database/                 # 数据库模块
-│   ├── sqlite_manager.py     # SQLite存储
-│   ├── es_manager.py         # Elasticsearch存储
-│   └── storage_adapter.py    # 存储适配器
+├── main.py                   # 🎯 CLI入口
+├── main_gui.py               # 🖥️ GUI入口 (v1.3.0新增)
+├── config.py                 # ⚙️ 配置管理
 │
-├── scrapers/                 # 爬虫模块
-│   ├── chatgpt_scraper.py    # ChatGPT爬虫
-│   ├── claude_scraper.py     # Claude爬虫
-│   ├── deepseek_scraper.py   # DeepSeek爬虫
-│   └── scraper_factory.py    # 爬虫工厂
+├── gui/                      # 🖥️ GUI模块 (v1.3.0新增)
+│   ├── main_window.py        # 主窗口
+│   ├── conversation_list.py  # 对话列表
+│   ├── detail_panel.py       # 详情面板
+│   ├── clipboard_monitor.py  # 剪贴板监控
+│   ├── system_tray.py        # 系统托盘
+│   ├── task_queue.py         # 任务队列
+│   ├── task_manager.py       # 任务管理器
+│   ├── error_handler.py      # 错误处理 (v1.3.0新增)
+│   ├── widgets/              # 组件
+│   │   ├── search_bar.py
+│   │   └── progress_widget.py
+│   └── dialogs/              # 对话框
+│       ├── add_dialog.py
+│       ├── add_prompt_dialog.py
+│       └── error_viewer.py   # 错误查看器 (v1.3.0新增)
 │
-├── ai/                       # AI分析模块
-│   ├── ollama_client.py      # Ollama客户端
-│   └── openai_client.py      # OpenAI客户端
+├── install.bat               # Windows一键安装
+├── install.sh                # Linux/macOS一键安装
+├── run.bat                   # Windows快速启动
+├── run.sh                    # Linux/macOS快速启动
+├── run_tests.bat             # Windows测试脚本
+├── run_tests.py              # 测试运行器
 │
-└── tests/                    # 测试套件（66个测试）
+├── database/                 # 💾 数据库模块
+│   ├── __init__.py
+│   ├── db_manager.py         # 数据库管理器（核心）
+│   └── schema.sql            # 数据库表结构定义
+│
+├── scrapers/                 # 🕷️ 网页爬虫模块
+│   ├── __init__.py
+│   ├── base_scraper.py       # 爬虫基类
+│   ├── chatgpt_scraper.py    # ChatGPT爬虫实现
+│   ├── claude_scraper.py     # Claude爬虫实现
+│   └── scraper_factory.py    # 爬虫工厂（自动选择）
+│
+├── ai/                       # 🤖 AI分析模块
+│   ├── __init__.py
+│   ├── ollama_client.py      # Ollama本地模型客户端
+│   └── openai_client.py      # OpenAI/DeepSeek API客户端
+│
+├── tests/                    # 🧪 测试套件
+│   ├── conftest.py           # Pytest配置
+│   ├── gui/                  # GUI测试 (v1.3.0新增, 76个)
+│   ├── e2e/                  # E2E测试 (v1.3.0新增, 31个)
+│   ├── unit/                 # 单元测试 (19个)
+│   └── integration/          # 集成测试 (10个)
+│
+└── docs/                     # 📚 文档目录
+    ├── GUI_GUIDE.md          # GUI使用指南 (v1.3.0新增)
+    ├── ERROR_HANDLING_GUIDE.md  # 错误处理指南 (v1.3.0新增)
+    ├── V1.3.0_PLAN.md        # v1.3.0开发计划
+    ├── V1.3.0_ERROR_HANDLING_IMPLEMENTATION.md  # 错误处理实施报告
+    ├── search_implementation.md      # 搜索实现文档
+    └── SEARCH_CONTEXT_FEATURE.md     # 搜索增强功能文档
 ```
+
+### 目录说明
+
+#### 核心模块
+
+- **`database/`** - 数据库管理模块
+  - 使用SQLite3存储对话数据
+  - 实现FTS5全文搜索
+  - 提供完整的CRUD操作
+  - 支持标签管理和统计
+
+- **`scrapers/`** - 网页爬虫模块
+  - 基于Playwright自动化抓取
+  - 支持多平台适配
+  - 实现多层回退机制
+  - 自动处理页面结构变化
+
+- **`ai/`** - AI分析模块（可选）
+  - 支持本地模型（Ollama）
+  - 支持在线API（OpenAI/DeepSeek）
+  - 自动生成摘要和标签
+  - 智能分类对话内容
+
+#### 测试
+
+- **136个测试用例** (v1.3.0更新)，覆盖核心功能
+  - 76个GUI单元测试
+  - 31个E2E测试
+  - 19个单元测试
+  - 10个集成测试
+- **100%通过率**，确保代码质量
+- **88%代码覆盖率**，持续改进中
+
+运行测试：
+```bash
+# 所有测试
+pytest tests/ -v
+
+# GUI测试
+pytest tests/gui/ -v
+
+# E2E测试
+pytest tests/e2e/ -v
+
+# 覆盖率报告
+pytest tests/ --cov=. --cov-report=html
+```
+
+#### 文档
+
+- **`docs/`** - 详细技术文档
+  - 功能说明文档
+  - 实现细节文档
+  - 开发过程归档
 
 ## 🔧 配置说明
 
-ChatCompass的核心功能（添加、搜索、查看）**无需配置**即可使用。
-
 ### AI功能配置（可选）
+
+ChatCompass的核心功能（添加、搜索、查看）**不需要配置AI**即可使用。
+
+AI功能仅用于：
+- 自动生成对话摘要
+- 自动分类对话
+- 自动提取标签
 
 #### 本地模式（推荐，免费）
 
-```bash
-# 1. 安装Ollama (https://ollama.ai)
-ollama pull qwen2.5:7b
-
-# 2. 配置.env
+```env
+# .env 文件
 AI_MODE=local
+OLLAMA_BASE_URL=http://localhost:11434
 OLLAMA_MODEL=qwen2.5:7b
 ```
 
+**安装Ollama：**
+1. 访问 https://ollama.ai 下载安装
+2. 运行 `ollama pull qwen2.5:7b`
+3. 启动服务 `ollama serve`
+
 #### 在线模式
 
-```bash
-# 使用DeepSeek（推荐）或OpenAI
+```env
 AI_MODE=online
+
+# 使用DeepSeek（推荐，性价比高）
 DEEPSEEK_API_KEY=your-api-key
+DEEPSEEK_MODEL=deepseek-chat
+
+# 或使用OpenAI
+OPENAI_API_KEY=your-api-key
+OPENAI_MODEL=gpt-4o-mini
 ```
 
 #### 禁用AI（默认）
 
-```bash
-# 留空即可
+```env
+# 留空或不配置，程序会跳过AI分析
 AI_MODE=
+```
+
+## 🎯 使用技巧
+
+### 搜索技巧
+
+```bash
+# 单关键词
+python main.py search "Python"
+
+# 多关键词（空格分隔）
+python main.py search "Python 数据分析"
+
+# 精确短语（使用引号）
+python main.py search "机器学习入门"
+```
+
+### 查看对话
+
+```bash
+# 通过ID查看
+python main.py show 1
+
+# 通过URL查看
+python main.py show "https://chatgpt.com/share/xxxxx"
+
+# 交互模式中查看
+ChatCompass> show 1
+```
+
+### 批量管理
+
+```bash
+# 列出所有对话
+ChatCompass> list
+
+# 查看统计信息
+ChatCompass> stats
+
+# 按分类筛选
+ChatCompass> list --category 编程
 ```
 
 ## 🧪 测试
 
+项目包含完整的测试套件，确保代码质量。
+
+### 🧪 测试框架 (v1.3.0新增)
+
+ChatCompass配备了完善的测试基础设施:
+
+#### 渐进式测试系统 ⭐ NEW
+
+**核心理念**: 遇错即停 → 查看详情 → 修复验证 → 继续测试
+
 ```bash
-# 运行测试
-python run_all_tests.py
+# 交互式测试 (推荐)
+python run_tests_interactive.py
+
+# 快速模式
+python run_tests_interactive.py --quick
+
+# 测试特定模块
+python run_tests_interactive.py tests/unit/test_db_manager.py
+```
+
+**特性**:
+- ✅ 遇到错误立即暂停
+- ✅ 显示完整错误堆栈
+- ✅ 检查应用层错误历史
+- ✅ 交互式修复验证
+- ✅ 导出错误日志
+- ✅ 提升37.5%测试效率
+
+详见: [`docs/PROGRESSIVE_TESTING_GUIDE.md`](docs/PROGRESSIVE_TESTING_GUIDE.md)
+
+#### 传统测试模式
+
+```bash
+# Windows
+run_tests.bat
+
+# Linux/macOS  
+python run_tests.py
 
 # 或使用pytest
+pytest tests/ -v
+```
+
+### 测试覆盖
+
+| 测试类别 | 数量 | 说明 |
+|---------|------|------|
+| GUI单元测试 | 76 | 主窗口/对话列表/详情面板/任务队列/托盘等 |
+| E2E测试 | 31 | GUI工作流/剪贴板监控/系统集成 |
+| 单元测试 | 19 | 数据库/爬虫/AI客户端 |
+| 集成测试 | 10 | 完整流程测试 |
+| **总计** | **136** | **100%通过率** |
+
+详见：[docs/GUI_GUIDE.md](docs/GUI_GUIDE.md)
+
+## 📊 数据库设计
+
+### 核心表结构
+
+```sql
+-- 对话表
+conversations (
+    id INTEGER PRIMARY KEY,
+    source_url TEXT UNIQUE,      -- 原始链接
+    platform TEXT,                -- 平台（chatgpt/claude）
+    title TEXT,                   -- 对话标题
+    raw_content TEXT,             -- 完整对话内容（JSON）
+    summary TEXT,                 -- AI摘要
+    category TEXT,                -- 分类
+    word_count INTEGER,           -- 字数统计
+    message_count INTEGER,        -- 消息数
+    created_at DATETIME,          -- 创建时间
+    updated_at DATETIME,          -- 更新时间
+    is_favorite INTEGER,          -- 是否收藏
+    notes TEXT                    -- 用户备注
+)
+
+-- 标签表
+tags (
+    id INTEGER PRIMARY KEY,
+    name TEXT UNIQUE,             -- 标签名
+    color TEXT,                   -- 颜色
+    usage_count INTEGER           -- 使用次数
+)
+
+-- 关联表
+conversation_tags (
+    conversation_id INTEGER,
+    tag_id INTEGER,
+    PRIMARY KEY (conversation_id, tag_id)
+)
+
+-- FTS5全文搜索表
+conversations_fts (
+    title, summary, raw_content
+)
+```
+
+详见：[database/schema.sql](database/schema.sql)
+
+## 📝 更新日志
+
+### v1.2 (2026-01-13) - 搜索增强
+
+- ✨ 新增：搜索结果显示上下文定位
+- ✨ 新增：精确标注匹配位置
+- ✨ 新增：关键词高亮显示
+- ✨ 新增：支持多处匹配展示
+- 🎨 优化：搜索结果显示格式
+
+### v1.1 (2026-01-12) - Show功能
+
+- ✨ 新增：show命令查看对话详情
+- 🐛 修复：ChatGPT爬虫页面结构适配
+- 🎨 优化：交互模式体验
+- 🔧 改进：Windows控制台编码处理
+
+### v1.0 (2026-01-12) - 初始版本
+
+- ✅ 基础功能完成
+- ✅ 52个测试通过
+- ✅ ChatGPT和Claude平台支持
+
+完整更新日志：[CHANGELOG.md](CHANGELOG.md)
+
+## 🛠️ 技术栈
+
+- **语言**: Python 3.9+
+- **数据库**: SQLite3 + FTS5（全文搜索）
+- **爬虫**: Playwright + BeautifulSoup4
+- **AI**: Ollama (本地) / OpenAI API (在线)
+- **测试**: Pytest
+- **GUI**: PyQt6（计划中）
+
+## 🤝 贡献指南
+
+我们欢迎并感谢任何形式的贡献！在开始之前，请阅读我们的贡献指南：
+
+📖 **完整文档**: [CONTRIBUTING.md](CONTRIBUTING.md)
+
+### 快速开始
+
+1. **Fork并克隆仓库**
+   ```bash
+   git clone https://github.com/YOUR_USERNAME/ChatCompass.git
+   cd ChatCompass
+   ```
+
+2. **创建功能分支**（遵循命名规范）
+   ```bash
+   git checkout -b feature/your-feature-name
+   # 或
+   git checkout -b bugfix/your-bugfix-name
+   ```
+
+3. **开发并测试**
+   ```bash
+   # 开发功能...
+   # 添加测试...
+   python -m pytest tests/ -v  # 必须通过所有测试
+   ```
+
+4. **提交代码**（遵循Commit规范）
+   ```bash
+   git commit -m "feat(scope): your feature description"
+   ```
+
+5. **推送并创建Pull Request**
+   ```bash
+   git push origin feature/your-feature-name
+   # 在GitHub上创建PR
+   ```
+
+### 📋 重要规范
+
+- 🌳 **分支管理**: [docs/BRANCH_MANAGEMENT.md](docs/BRANCH_MANAGEMENT.md)
+- 📝 **提交规范**: Conventional Commits格式
+- 🧪 **测试要求**: 所有测试必须通过，新功能需要测试
+- 🔒 **安全规则**: SQL必须使用参数化查询
+- 🤖 **AI助手**: [.ai-assistant-rules.md](.ai-assistant-rules.md)
+
+### 🚫 禁止操作
+
+- ❌ 直接推送到 main 或 develop 分支
+- ❌ 提交未经测试的代码
+- ❌ 使用字符串拼接构造SQL（SQL注入风险）
+- ❌ 提交包含密码、密钥等敏感信息
+
+### 开发环境设置
+
+```bash
+# 安装开发依赖
+pip install -r requirements.txt
+pip install pytest pytest-cov
+
+# 运行测试
 pytest tests/ -v
 
 # 生成覆盖率报告
 pytest tests/ --cov=. --cov-report=html
 ```
 
-**测试覆盖：** 66个测试，98.5%通过率，87%代码覆盖率
-
-详见：[测试指南](TESTING_GUIDE.md)
-
-## 📚 文档索引
-
-| 场景 | 推荐文档 |
-|------|---------|
-| 🚀 **快速开始** | [README.md](README.md) |
-| 📖 **命令参考** | [QUICK_REFERENCE.md](QUICK_REFERENCE.md) |
-| 🐳 **Docker部署** | [DOCKER_BUILD_GUIDE.md](DOCKER_BUILD_GUIDE.md) |
-| 🧪 **运行测试** | [TESTING_GUIDE.md](TESTING_GUIDE.md) |
-| 🤝 **参与贡献** | [CONTRIBUTING.md](CONTRIBUTING.md) |
-| 📝 **版本历史** | [CHANGELOG.md](CHANGELOG.md) |
-| 🔍 **完整索引** | [DOCUMENTATION_INDEX.md](DOCUMENTATION_INDEX.md) |
-
-## 🛠️ 技术栈
-
-- **语言**: Python 3.9+
-- **数据库**: SQLite3 / Elasticsearch
-- **爬虫**: Playwright + BeautifulSoup4
-- **AI**: Ollama / OpenAI API
-- **测试**: Pytest + pytest-cov
-- **容器**: Docker + Docker Compose
-
-## 🤝 贡献指南
-
-欢迎贡献！请阅读 [CONTRIBUTING.md](CONTRIBUTING.md) 了解详情。
-
-### 快速流程
-
-```bash
-# 1. Fork并克隆
-git clone https://github.com/YOUR_USERNAME/ChatCompass.git
-
-# 2. 创建分支
-git checkout -b feature/your-feature
-
-# 3. 开发并测试
-pytest tests/ -v
-
-# 4. 提交PR
-git commit -m "feat: your feature"
-git push origin feature/your-feature
-```
-
 ## 📄 许可证
 
-MIT License - 详见 [LICENSE](LICENSE)
+本项目采用 MIT 许可证 - 详见 [LICENSE](LICENSE) 文件
+
+## ⚠️ 免责声明
+
+本工具仅供个人学习和研究使用。使用本工具抓取第三方网站内容时，请遵守相关网站的服务条款和robots.txt规则。用户需自行承担使用本工具的法律责任。
 
 ## 💬 支持与反馈
 
-- 📮 [GitHub Issues](https://github.com/yourusername/ChatCompass/issues)
-- 💬 [GitHub Discussions](https://github.com/yourusername/ChatCompass/discussions)
+- 📮 提交Issue: [GitHub Issues](https://github.com/yourusername/ChatCompass/issues)
+- 📧 邮箱: your.email@example.com
+- 💬 讨论: [GitHub Discussions](https://github.com/yourusername/ChatCompass/discussions)
 
 ## 🙏 致谢
 
-感谢以下开源项目：[Playwright](https://playwright.dev/) · [Ollama](https://ollama.ai/) · [SQLite](https://www.sqlite.org/) · [BeautifulSoup](https://www.crummy.com/software/BeautifulSoup/)
+感谢以下开源项目：
+
+- [Playwright](https://playwright.dev/) - 强大的浏览器自动化工具
+- [Ollama](https://ollama.ai/) - 本地大模型运行平台
+- [SQLite FTS5](https://www.sqlite.org/fts5.html) - 全文搜索引擎
+- [BeautifulSoup4](https://www.crummy.com/software/BeautifulSoup/) - HTML解析库
+
+## ⭐ Star历史
+
+如果这个项目对你有帮助，请给个⭐️吧！
 
 ---
 

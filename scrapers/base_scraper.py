@@ -75,6 +75,21 @@ class BaseScraper(ABC):
         """抓取对话内容"""
         pass
     
+    async def scrape_async(self, url: str) -> ConversationData:
+        """
+        异步抓取对话数据
+        
+        Args:
+            url: 对话链接
+            
+        Returns:
+            ConversationData: 对话数据
+        """
+        # 默认实现: 在线程池中运行同步scrape方法
+        import asyncio
+        loop = asyncio.get_event_loop()
+        return await loop.run_in_executor(None, self.scrape, url)
+    
     def validate_url(self, url: str) -> bool:
         """验证URL格式"""
         return url.startswith('http://') or url.startswith('https://')

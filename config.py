@@ -31,18 +31,7 @@ DEEPSEEK_MODEL = os.getenv('DEEPSEEK_MODEL', 'deepseek-chat')
 
 # ==================== 数据库配置 ====================
 
-# 存储类型: sqlite / elasticsearch
-STORAGE_TYPE = os.getenv('STORAGE_TYPE', 'sqlite')
-
-# SQLite配置
 DATABASE_PATH = os.getenv('DATABASE_PATH', str(PROJECT_ROOT / 'data' / 'chatcompass.db'))
-
-# Elasticsearch配置
-ELASTICSEARCH_HOST = os.getenv('ELASTICSEARCH_HOST', 'localhost')
-ELASTICSEARCH_PORT = int(os.getenv('ELASTICSEARCH_PORT', '9200'))
-ELASTICSEARCH_INDEX_PREFIX = os.getenv('ELASTICSEARCH_INDEX_PREFIX', 'chatcompass')
-ELASTICSEARCH_USER = os.getenv('ELASTICSEARCH_USER', '')
-ELASTICSEARCH_PASSWORD = os.getenv('ELASTICSEARCH_PASSWORD', '')
 
 # ==================== 爬虫配置 ====================
 
@@ -78,37 +67,26 @@ TAG_COLORS = {
 }
 
 
-def get_storage():
-    """根据配置获取存储实例（推荐使用此方法）"""
-    from database.base_storage import StorageFactory
+def get_storage(db_path=None):
+    """
+    获取数据库存储实例
     
-    if STORAGE_TYPE == 'sqlite':
-        return StorageFactory.create('sqlite', db_path=DATABASE_PATH)
-    elif STORAGE_TYPE == 'elasticsearch':
-        kwargs = {
-            'host': ELASTICSEARCH_HOST,
-            'port': ELASTICSEARCH_PORT,
-            'index_prefix': ELASTICSEARCH_INDEX_PREFIX
-        }
-        # 可选的认证信息
-        if ELASTICSEARCH_USER and ELASTICSEARCH_PASSWORD:
-            kwargs['username'] = ELASTICSEARCH_USER
-            kwargs['password'] = ELASTICSEARCH_PASSWORD
-        return StorageFactory.create('elasticsearch', **kwargs)
-    else:
-        raise ValueError(f"不支持的存储类型: {STORAGE_TYPE}")
-
-
-def get_ai_service():
-    """根据配置获取AI服务（推荐使用此方法）"""
-    from ai import get_ai_service as _get_ai_service
+    Args:
+        db_path: 数据库路径 (可选,默认使用配置中的路径)
+        
+    Returns:
+        DatabaseManager实例
+    """
+    from database.db_manager import DatabaseManager
     
-    # 返回全局AI服务实例（单例模式）
-    return _get_ai_service()
+    if db_path is None:
+        db_path = DATABASE_PATH
+        
+    return DatabaseManager(db_path)
 
 
 def get_ai_client():
-    """根据配置获取AI客户端（向后兼容，推荐使用get_ai_service）"""
+    """根据配置获取AI客户端"""
     if AI_MODE == 'local':
         from ai.ollama_client import OllamaClient
         return OllamaClient(base_url=OLLAMA_BASE_URL, model=OLLAMA_MODEL)
