@@ -1,4 +1,4 @@
-# ChatCompass - AI对话知识库管理系统
+# ChatCompass - AI对话知识库管理系统 (deprecated)
 
 <div align="center">
 
